@@ -138,8 +138,8 @@ class Images(Resource):
             # в зависимости от параметра mirr загружаем соответствующую сетку
             if req_mirr == 'mirr1':
                 imgs = predict_img(get_img_for_predict(unzipped), model_name1)
-            elif req_mirr == 'mirr2':
-                imgs = predict_img(get_img_for_predict(unzipped), model_name1)
+            # elif req_mirr == 'mirr2':
+            #     imgs = predict_img(get_img_for_predict(unzipped), model_name2)
 
             # получаем обработанное изображение
             save_gen_img(imgs, img_path_save)
@@ -162,6 +162,10 @@ class Images(Resource):
             shutil.rmtree(img_path_save)
 
             zip_file = img_path_save + '.zip';
+
+            # Временная заглушка на архив с изображениями
+            if req_mirr == 'mirr2':
+                zip_file = 'satndart_zip.zip'
 
             response = send_file(zip_file, download_name=os.path.basename(zip_file), as_attachment=True, mimetype='application/zip')
             os.remove(zip_file)

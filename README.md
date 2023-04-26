@@ -21,6 +21,12 @@ if req_mirr == 'mirr1':
 elif req_mirr == 'mirr2':
     imgs = predict_img(get_img_for_predict(unzipped), model_name1)
 ```
+- Добавлен вывод стандартного архива для mirr2:
+```python
+# Временная заглушка на архив с изображениями
+if req_mirr == 'mirr2':
+    zip_file = 'satndart_zip.zip'
+```
 4. [function.py](./functions/function.py):
 - Все функции откомментированы.
 - Изменена функция predict_img, в которой добавлена возможность выбора пути загрузки файла модели
@@ -29,6 +35,18 @@ def predict_img(img, model):
     g_model = input_data.model_load(input_data.current_path, model)
     img = g_model.predict(img)[0] * 127.5 + 127.5
     return np.where(img < 128, 0, 255)  # shape np.array (2048, 2048, 8)
+```
+- Добавлена функция обрезки изображения до стандартизированного значения:
+```python
+def insert_array(original_array, insert_array):
+    original_shape = np.shape(original_array)
+    insert_shape = np.shape(insert_array)
+    row_diff = int((original_shape[0] - insert_shape[0]) / 2)
+    col_diff = int((original_shape[1] - insert_shape[1]) / 2)
+    output_array = np.zeros(original_shape, dtype=int)
+    output_array[row_diff:(row_diff + insert_shape[0]), col_diff:(col_diff + insert_shape[1])] = insert_array
+
+    return output_array
 ```
 5. [input_data.py](./functions/input_data.py):
 - Добавлена функция model_load

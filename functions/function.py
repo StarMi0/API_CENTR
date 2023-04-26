@@ -4,13 +4,26 @@ import numpy as np
 import input_data
 
 
+def insert_array(original_array, insert_array):
+    original_shape = np.shape(original_array)
+    insert_shape = np.shape(insert_array)
+    row_diff = int((original_shape[0] - insert_shape[0]) / 2)
+    col_diff = int((original_shape[1] - insert_shape[1]) / 2)
+    output_array = np.zeros(original_shape, dtype=int)
+    output_array[row_diff:(row_diff + insert_shape[0]), col_diff:(col_diff + insert_shape[1])] = insert_array
+
+    return output_array
+
+
 def read_img(dir) -> np.array:
     """
     his function reads in a single image from the given directory, crops it to the desired size, and then converts it
     to a numpy array with binary values (-1 for 0 and 1 for non-zero pixels). The output is a numpy array with shape
     (2048, 2048, 1).
     """
-    img = cv2.imread(dir, cv2.IMREAD_GRAYSCALE)[800:2848, 136:2184].astype(np.bool_).astype(np.int8)
+    img = cv2.imread(dir, cv2.IMREAD_GRAYSCALE).astype(np.bool_).astype(np.int8)
+    new_array = np.zeros((1024, 1024))
+    img = insert_array(img, new_array)
     img[img == 0] = -1
     return np.expand_dims(img, axis=2)  # shape np.array (2048, 2048, 1)
 
@@ -48,7 +61,7 @@ def save_gen_img(img, path):
     individual .png file in the given path. The output is eight separate files containing the data from the input
     image.
     """
-    Z = np.zeros((8, 3088, 2320))
+    Z = np.zeros((8, 1024, 1024))
     for i in range(8):
-        Z[i, 800:2848, 136:2184] = img[:, :, i]
+        Z[i, :, :] = img[:, :, i]
         cv2.imwrite(os.path.join(path, f'{str(i)}.png'), Z[i])
