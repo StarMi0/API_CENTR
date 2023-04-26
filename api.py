@@ -155,7 +155,7 @@ class Images(Resource):
 
             # Временная заглушка на архив с изображениями
             if req_mirr == 'mirr2':
-                zip_file = 'input/right_masks_samples.zip'
+                zip_file = 'left_masks/left_masks.zip'
 
             response = send_file(zip_file, download_name=os.path.basename(zip_file), as_attachment=True, mimetype='application/zip')
             os.remove(zip_file)
