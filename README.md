@@ -22,6 +22,7 @@ elif req_mirr == 'mirr2':
     imgs = predict_img(get_img_for_predict(unzipped), model_name1)
 ```
 4. [function.py](./functions/function.py):
+- Все функции откомментированы.
 - Изменена функция predict_img, в которой добавлена возможность выбора пути загрузки файла модели
 ```python
 def predict_img(img, model):
