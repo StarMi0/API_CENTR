@@ -25,7 +25,7 @@ UPLOAD_FOLDER = 'inputs/'
 RESULT_FOLDER = 'result/'
 
 # g_model and weights downloading
-model_name1 = 'M_good190.h5'
+model_name1 = 'models/M_5.h5'
 
 def allowed_file(file_name):
     """
@@ -155,7 +155,7 @@ class Images(Resource):
 
             # Временная заглушка на архив с изображениями
             if req_mirr == 'mirr2':
-                zip_file = 'standart_zip.zip'
+                zip_file = 'input/right_masks_samples.zip'
 
             response = send_file(zip_file, download_name=os.path.basename(zip_file), as_attachment=True, mimetype='application/zip')
             os.remove(zip_file)
