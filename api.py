@@ -130,9 +130,9 @@ class Images(Resource):
                         pass
 
             # в зависимости от параметра mirr загружаем соответствующую сетку
-            if req_mirr == 'mirr1':
+            if req_mirr == 'mirr1': # для правой стопы
                 imgs = predict_img(get_img_for_predict(unzipped), model_name1)
-            # elif req_mirr == 'mirr2':
+            # elif req_mirr == 'mirr2': # для левой стопы
             #     imgs = predict_img(get_img_for_predict(unzipped), model_name2)
 
             # получаем обработанное изображение
