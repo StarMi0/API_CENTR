@@ -24,6 +24,8 @@ ALLOWED_EXTENSIONS = {'zip', 'rar', '7z', 'tar', 'gz'}
 UPLOAD_FOLDER = 'inputs/'
 RESULT_FOLDER = 'result/'
 
+# g_model and weights downloading
+model_name1 = 'M_good190.h5'
 
 def allowed_file(file_name):
     """
@@ -133,27 +135,14 @@ class Images(Resource):
                     except:
                         pass
 
-            # зеркалим файлы, если mirr2
-            if req_mirr == 'mirr2':
-                for filename in os.listdir(unzipped):
-                    if filename.endswith('.png'):
-                        img = cv2.imread(os.path.join(unzipped, filename))
-                        img_flip_lr = cv2.flip(img, 1)
-                        cv2.imwrite(os.path.join(unzipped, filename), img_flip_lr)
+            # в зависимости от параметра mirr загружаем соответствующую сетку
+            if req_mirr == 'mirr1':
+                imgs = predict_img(get_img_for_predict(unzipped), model_name1)
+            elif req_mirr == 'mirr2':
+                imgs = predict_img(get_img_for_predict(unzipped), model_name1)
 
             # получаем обработанное изображение
-
-            imgs = predict_img(get_img_for_predict(unzipped))
-
             save_gen_img(imgs, img_path_save)
-
-            # зеркалим файлы еще раз, если mirr2
-            if req_mirr == 'mirr2':
-                for filename in os.listdir(img_path_save):
-                    if filename.endswith('.png'):
-                        img = cv2.imread(os.path.join(img_path_save, filename))
-                        img_flip_lr = cv2.flip(img, 1)
-                        cv2.imwrite(os.path.join(img_path_save, filename), img_flip_lr)
 
             # переименовываем файлы обратно
             for i in range(8):
