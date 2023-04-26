@@ -61,7 +61,7 @@ def save_gen_img(img, path):
     individual .png file in the given path. The output is eight separate files containing the data from the input
     image.
     """
-    Z = np.zeros((8, 1024, 1024))
+    Z = np.zeros((8, 1344, 1008))
     for i in range(8):
-        Z[i, :, :] = img[:, :, i]
+        Z[i, :, :] = img[:, :1008, i]
         cv2.imwrite(os.path.join(path, f'{str(i)}.png'), Z[i])
