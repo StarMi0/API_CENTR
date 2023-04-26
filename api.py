@@ -118,11 +118,11 @@ class Images(Resource):
 
             # сохраняем оригинальные имена файлов, создаем список новых имен файлов
             #new_file_names_mirr2 = ["0", "035", "090", "145", "180", "215", "270", "325"]
-            new_file_names_mirr2 = ["a", "b", "c", "d", "e", "f", "g", "h"]
+            # new_file_names_mirr2 = ["a", "b", "c", "d", "e", "f", "g", "h"]
             #new_file_names_mirr1 = ["180", "145", "090", "035", "0", "325", "270", "215"]
-            new_file_names_mirr1 = ["i", "j", "k", "l", "m", "n", "o", "p"]
+            # new_file_names_mirr1 = ["i", "j", "k", "l", "m", "n", "o", "p"]
 
-            new_file_names = new_file_names_mirr1 if req_mirr == 'mirr1' else new_file_names_mirr2
+            # new_file_names = new_file_names_mirr1 if req_mirr == 'mirr1' else new_file_names_mirr2
 
             # original_file_names_with_affix = list(map(add_affix, original_file_names))
             # переименовываем файлы
@@ -145,8 +145,8 @@ class Images(Resource):
             save_gen_img(imgs, img_path_save)
 
             # переименовываем файлы обратно
-            for i in range(8):
-                os.rename(os.path.join(img_path_save, f'{str(i)}.png'), os.path.join(img_path_save, new_file_names_mirr2[i] + '.png'))
+            # for i in range(8):
+            #     os.rename(os.path.join(img_path_save, f'{str(i)}.png'), os.path.join(img_path_save, new_file_names_mirr2[i] + '.png'))
 
             # конвертируем в gray
             for filename in os.listdir(img_path_save):
