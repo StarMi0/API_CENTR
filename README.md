@@ -27,6 +27,21 @@ elif req_mirr == 'mirr2':
 if req_mirr == 'mirr2':
     zip_file = 'satndart_zip.zip'
 ```
+- Вернул стандартную функцию переименовывания:
+```python
+# сохраняем оригинальные имена файлов, создаем список новых имен файлов
+new_file_names = ["0", "035", "090", "145", "180", "215", "270", "325"]
+
+# переименовываем файлы
+file_counter = 0
+for filename in files:
+    if filename.endswith('.png'):
+        try:
+            os.rename(os.path.join(unzipped, filename), os.path.join(unzipped, new_file_names[file_counter] + ".png"))
+            file_counter += 1
+        except:
+            pass
+```
 4. [function.py](./functions/function.py):
 - Все функции откомментированы.
 - Изменена функция predict_img, в которой добавлена возможность выбора пути загрузки файла модели

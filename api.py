@@ -117,14 +117,8 @@ class Images(Resource):
             files.sort()
 
             # сохраняем оригинальные имена файлов, создаем список новых имен файлов
-            #new_file_names_mirr2 = ["0", "035", "090", "145", "180", "215", "270", "325"]
-            # new_file_names_mirr2 = ["a", "b", "c", "d", "e", "f", "g", "h"]
-            #new_file_names_mirr1 = ["180", "145", "090", "035", "0", "325", "270", "215"]
-            # new_file_names_mirr1 = ["i", "j", "k", "l", "m", "n", "o", "p"]
+            new_file_names = ["0", "035", "090", "145", "180", "215", "270", "325"]
 
-            # new_file_names = new_file_names_mirr1 if req_mirr == 'mirr1' else new_file_names_mirr2
-
-            # original_file_names_with_affix = list(map(add_affix, original_file_names))
             # переименовываем файлы
             file_counter = 0
             for filename in files:
@@ -144,10 +138,6 @@ class Images(Resource):
             # получаем обработанное изображение
             save_gen_img(imgs, img_path_save)
 
-            # переименовываем файлы обратно
-            # for i in range(8):
-            #     os.rename(os.path.join(img_path_save, f'{str(i)}.png'), os.path.join(img_path_save, new_file_names_mirr2[i] + '.png'))
-
             # конвертируем в gray
             for filename in os.listdir(img_path_save):
                 if filename.endswith('.png'):
@@ -165,7 +155,7 @@ class Images(Resource):
 
             # Временная заглушка на архив с изображениями
             if req_mirr == 'mirr2':
-                zip_file = 'satndart_zip.zip'
+                zip_file = 'standart_zip.zip'
 
             response = send_file(zip_file, download_name=os.path.basename(zip_file), as_attachment=True, mimetype='application/zip')
             os.remove(zip_file)
