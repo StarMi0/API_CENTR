@@ -42,6 +42,36 @@ for filename in files:
         except:
             pass
 ```
+- Временно изменено условие срабатывания сетки при выборе стороны, при выборе левой стопы, запускается код на выгрузку готового архива
+```python
+# в зависимости от параметра mirr загружаем соответствующую сетку
+if req_mirr == 'mirr1': # для правой стопы
+    imgs = predict_img(get_img_for_predict(unzipped), model_name1)
+# elif req_mirr == 'mirr2': # для левой стопы
+#     imgs = predict_img(get_img_for_predict(unzipped), model_name2)
+
+    # получаем обработанное изображение
+    save_gen_img(imgs, img_path_save)
+
+    # конвертируем в gray
+    for filename in os.listdir(img_path_save):
+        if filename.endswith('.png'):
+            img = cv2.imread(os.path.join(img_path_save, filename))
+            gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            cv2.imwrite(os.path.join(img_path_save, filename), gray_image)
+
+    zip_folder(img_path_save)
+
+    os.remove(image_file_path)
+    shutil.rmtree(unzipped)
+    shutil.rmtree(img_path_save)
+
+    zip_file = img_path_save + '.zip';
+
+# Временная заглушка на архив с изображениями
+elif req_mirr == 'mirr2':
+    zip_file = 'left_masks/left_masks.zip'
+```
 4. [function.py](./functions/function.py):
 - Все функции откомментированы.
 - Изменена функция predict_img, в которой добавлена возможность выбора пути загрузки файла модели
