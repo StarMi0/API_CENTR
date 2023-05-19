@@ -1,5 +1,6 @@
 import tensorflow as tf
 import time
+
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     # tf.config.experimental.set_memory_growth(gpu, True)
@@ -7,7 +8,6 @@ for gpu in gpus:
         gpu,
         [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=4096)]
     )
-
 
 import time, os, werkzeug, zipfile, cv2, shutil
 from flask import Flask, render_template, make_response, request, Blueprint, send_file
@@ -25,7 +25,8 @@ UPLOAD_FOLDER = 'inputs/'
 RESULT_FOLDER = 'result/'
 
 # g_model and weights downloading
-model_name1 = 'models/M_5.h5'
+model_name1 = 'models/M_6.h5'
+
 
 def allowed_file(file_name):
     """
@@ -61,7 +62,8 @@ api = Api(app)
 
 # создаем парсер API-запросов
 parser = reqparse.RequestParser()
-parser.add_argument('image_file', type=werkzeug.datastructures.FileStorage, help='Binary Image in png format (zip, rar, 7z, tar, gz)', location='files', required=True)
+parser.add_argument('image_file', type=werkzeug.datastructures.FileStorage,
+                    help='Binary Image in png format (zip, rar, 7z, tar, gz)', location='files', required=True)
 parser.add_argument('scale', type=werkzeug.datastructures.Accept, required=True)
 
 
@@ -71,95 +73,69 @@ class Images(Resource):
     # если POST-запрос
     @api.expect(parser)
     def post(self):
-
         try:
-            # определяем текущее время
             start_time = time.time()
 
-            # проверка наличия файла в запросе
             if 'image_file' not in request.files:
                 raise ValueError('No input file')
 
-
-            # получаем данные из запроса
             f = request.files['image_file']
-
             req_mirr = request.form.get('mirr');
 
-            # проверка на наличие имени у файла
             if f.filename == '':
                 raise ValueError('Empty file name')
 
-            # проверка на допустимое расширение файла (png, jpg, jpeg, tga, dds)
             if not allowed_file(f.filename):
-                raise ValueError('Upload an image in one of the formats (zip, rar, 7z, tar, gz)')
+                raise ValueError('Unsupported file type')
 
-            # имя файла
             image_file_name = secure_filename(f.filename)
-            # задаем полный путь к файлу
             image_file_path = os.path.join(app.config['UPLOAD_FOLDER'], image_file_name)
-            # сохраняем файл
             f.save(image_file_path)
 
-            unzipped = os.path.join(app.config['UPLOAD_FOLDER'], image_file_name.split('.')[0] + time.time().__str__())
-            img_path_save = os.path.join(app.config['RESULT_FOLDER'], image_file_name.split('.')[0])
-            if not os.path.exists(img_path_save):
-                os.mkdir(img_path_save)
+            unzipped_folder = os.path.join(app.config['UPLOAD_FOLDER'],
+                                           image_file_name.split('.')[0] + time.time().__str__())
+            result_folder = os.path.join(app.config['RESULT_FOLDER'], image_file_name.split('.')[0])
 
-            # unzipping files
+            if not os.path.exists(result_folder):
+                os.mkdir(result_folder)
+
             with zipfile.ZipFile(image_file_path, 'r') as zip_ref:
-                zip_ref.extractall(unzipped)
+                zip_ref.extractall(unzipped_folder)
 
             time.sleep(3)
 
-            # сортируем список файлов в директории
-            files = os.listdir(unzipped)
-            files.sort()
+            # Pass the unzipped folder to get_img_for_predict
+            img_for_pred = get_img_for_predict(unzipped_folder)
+            print('image is collected')
 
-            # сохраняем оригинальные имена файлов, создаем список новых имен файлов
-            new_file_names = ["0", "035", "090", "145", "180", "215", "270", "325"]
+            # Make predictions
+            if req_mirr == 'mirr1':
+                imgs = predict_img(img_for_pred, model_name1)
 
-            # переименовываем файлы
-            file_counter = 0
-            for filename in files:
+            save_gen_img(imgs, result_folder)
+
+            for filename in os.listdir(result_folder):
                 if filename.endswith('.png'):
-                    try:
-                        os.rename(os.path.join(unzipped, filename), os.path.join(unzipped, new_file_names[file_counter] + ".png"))
-                        file_counter += 1
-                    except:
-                        pass
+                    img = cv2.imread(os.path.join(result_folder, filename))
+                    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                    cv2.imwrite(os.path.join(result_folder, filename), gray_image)
 
-            # в зависимости от параметра mirr загружаем соответствующую сетку
-            if req_mirr == 'mirr1': # для правой стопы
-                imgs = predict_img(get_img_for_predict(unzipped), model_name1)
-            # elif req_mirr == 'mirr2': # для левой стопы
-            #     imgs = predict_img(get_img_for_predict(unzipped), model_name2)
+            zip_folder(result_folder)
 
-                # получаем обработанное изображение
-                save_gen_img(imgs, img_path_save)
+            os.remove(image_file_path)
+            shutil.rmtree(unzipped_folder)
+            shutil.rmtree(result_folder)
 
-                # конвертируем в gray
-                for filename in os.listdir(img_path_save):
-                    if filename.endswith('.png'):
-                        img = cv2.imread(os.path.join(img_path_save, filename))
-                        gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                        cv2.imwrite(os.path.join(img_path_save, filename), gray_image)
+            zip_file = result_folder + '.zip';
 
-                zip_folder(img_path_save)
-
-                os.remove(image_file_path)
-                shutil.rmtree(unzipped)
-                shutil.rmtree(img_path_save)
-
-                zip_file = img_path_save + '.zip';
-
-            # Временная заглушка на архив с изображениями
-            elif req_mirr == 'mirr2':
+            if req_mirr == 'mirr2':
                 zip_file = 'left_masks/left_masks.zip'
 
-            response = send_file(zip_file, download_name=os.path.basename(zip_file), as_attachment=True, mimetype='application/zip')
+            response = send_file(zip_file, download_name=os.path.basename(zip_file), as_attachment=True,
+                                 mimetype='application/zip')
             os.remove(zip_file)
             return response
+
         except ValueError as err:
             dict_response = {
                 'error': err.args[0],
@@ -179,5 +155,4 @@ class Images(Resource):
 # запускаем сервер на порту 8008 (или на любом другом свободном порту)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True, port=80)
-
 
