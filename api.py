@@ -103,12 +103,14 @@ class Images(Resource):
                 zip_ref.extractall(unzipped_folder)
 
             time.sleep(3)
-            print(f"image folder is: {unzipped_folder}")
+
             # Pass the unzipped folder to get_img_for_predict
             img_for_pred = get_img_for_predict(unzipped_folder)
-            print(f"image is collected: {type(img_for_pred)}\n"
-                  f"shape is: {img_for_pred.shape()}")
-
+            text = f"image folder is: {unzipped_folder}\n" \
+                   f"image is collected: {type(img_for_pred)}\n" \
+                   f"shape is: {img_for_pred.shape()}"
+            with open ("log.txt", "wa") as log_file:
+                log_file.write(text)
             # Make predictions
             if req_mirr == 'mirr1':
                 imgs = predict_img(img_for_pred, model_name1)
