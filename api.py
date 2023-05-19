@@ -106,7 +106,8 @@ class Images(Resource):
 
             # Pass the unzipped folder to get_img_for_predict
             img_for_pred = get_img_for_predict(unzipped_folder)
-            print('image is collected')
+            print(f"image is collected: {type(img_for_pred)}\n"
+                  f"shape is: {img_for_pred.shape()}")
 
             # Make predictions
             if req_mirr == 'mirr1':
