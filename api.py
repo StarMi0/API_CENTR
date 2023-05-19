@@ -103,7 +103,7 @@ class Images(Resource):
                 zip_ref.extractall(unzipped_folder)
 
             time.sleep(3)
-
+            print(f"image folder is: {unzipped_folder}")
             # Pass the unzipped folder to get_img_for_predict
             img_for_pred = get_img_for_predict(unzipped_folder)
             print(f"image is collected: {type(img_for_pred)}\n"
