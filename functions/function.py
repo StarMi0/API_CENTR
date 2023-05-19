@@ -2,7 +2,6 @@ import os
 import cv2
 import keras as keras
 import numpy as np
-import input_data
 
 
 def insert_array(original_array, insert_array):
