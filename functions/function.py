@@ -1,5 +1,6 @@
 import os
 import cv2
+import keras as keras
 import numpy as np
 import input_data
 
@@ -28,7 +29,7 @@ def read_img(dir) -> np.array:
     return np.expand_dims(img, axis=2)  # shape np.array (2048, 2048, 1)
 
 
-def get_img_for_predict(dir_folder):
+def get_img_for_predict(dir_folder: os.PathLike) -> np.array:
     """
     This function is used to read in the images in the given directory, sort them, and then concatenate them into a
     single array. The output is a numpy array with shape (1, 2048, 2048, 8).
@@ -44,7 +45,7 @@ def get_img_for_predict(dir_folder):
     return np.expand_dims(X1, axis=0)  # shape np.array (1, 2048, 2048, 8)
 
 
-def predict_img(img, model):
+def predict_img(img: np.array, model: keras.models) -> np.array:
     """
     This function loads the given model and uses it to predict the pixel values of the given image. The model output
     is then scaled and shifted so that it is in the range of 0-255, and any values less than 128 are replaced with 0.
